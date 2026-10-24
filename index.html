@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="ko">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>한글 타자 연습</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#101827;color:#edf3ff;font-family:system-ui,sans-serif;min-height:100vh;display:grid;place-items:center;padding:24px}main{width:min(640px,100%)}header{color:#6fe3bb;letter-spacing:3px;font-size:13px}h1{font-size:clamp(32px,7vw,48px);margin:12px 0}p{color:#aebbd0;line-height:1.7}.stats{display:flex;gap:12px;margin:30px 0}.stat{flex:1;background:#1b293e;padding:18px;border-radius:14px}.stat span{display:block;color:#aebbd0;font-size:13px}.stat strong{display:block;font-size:27px;margin-top:6px}.play{text-align:center;background:#182439;border:1px solid #30415c;border-radius:22px;padding:32px 24px}#word{font-size:40px;font-weight:700;min-height:60px;color:#6fe3bb}input{width:100%;padding:17px;font-size:20px;color:white;background:#101827;border:2px solid #405775;border-radius:12px;text-align:center;margin:20px 0 10px}input:focus{outline:2px solid #6fe3bb}button{border:0;border-radius:12px;background:#6fe3bb;color:#10281f;font-size:17px;font-weight:700;padding:15px 28px;cursor:pointer}button:hover{background:#a5f5d9}#message{min-height:30px;margin:12px 0 20px}footer{text-align:center;color:#8192ac;font-size:13px;margin-top:24px}
+</style>
+<main><header>KEYBOARD PLAYGROUND</header><h1>한글 타자 연습</h1><p>손끝으로 쌓는 작은 기록.<br>60초 동안 단어를 정확하게 입력해 보세요.</p>
+<div class="stats"><div class="stat"><span>남은 시간</span><strong id="time">60초</strong></div><div class="stat"><span>맞힌 단어</span><strong id="score">0</strong></div><div class="stat"><span>정확도</span><strong id="accuracy">—</strong></div></div>
+<section class="play" aria-label="타자게임"><div id="word">준비됐나요?</div><label for="answer">단어를 입력하고 Enter를 누르세요</label><input id="answer" autocomplete="off" spellcheck="false" placeholder="여기에 입력하세요" disabled><p id="message" role="status" aria-live="polite">시작 버튼을 누르면 시간이 흐릅니다.</p><button id="start">게임 시작</button></section><footer>한글 입력 지원 · 설치 없이 즐기는 타자게임</footer></main>
+<script>
+const words=['하늘','바다','나무','바람','구름','햇살','별빛','달빛','마음','행복','사랑','친구','여행','꿈나라','무지개','도서관','컴퓨터','키보드','고양이','강아지','아름다운','반짝반짝','대한민국','봄바람','초록빛','우주선','모험','음악','산책','소나기'];
+const el=id=>document.getElementById(id);let score=0,attempts=0,active=false,timer,deadline,previous='';
+function next(){const choices=words.filter(w=>w!==previous);previous=choices[Math.floor(Math.random()*choices.length)];el('word').textContent=previous;el('answer').value='';}
+function finish(){active=false;clearInterval(timer);el('time').textContent='0초';el('answer').disabled=true;el('word').textContent='수고했어요!';el('message').textContent=`최종 기록: ${score}개 정답 · 정확도 ${attempts?Math.round(score/attempts*100):0}%`;el('start').textContent='다시 도전';}
+function tick(){const remaining=Math.max(0,Math.ceil((deadline-Date.now())/1000));el('time').textContent=remaining+'초';if(!remaining)finish();}
+el('start').onclick=()=>{clearInterval(timer);score=0;attempts=0;active=true;deadline=Date.now()+60000;el('score').textContent='0';el('accuracy').textContent='—';el('time').textContent='60초';el('answer').disabled=false;el('message').textContent='좋아요! 첫 단어를 입력해 보세요.';el('start').textContent='처음부터 다시';next();el('answer').focus();timer=setInterval(tick,100);};
+el('answer').addEventListener('keydown',event=>{if(event.key!=='Enter'||event.isComposing||event.keyCode===229||!active)return;if(Date.now()>=deadline){finish();return;}const answer=el('answer').value.trim();if(!answer)return;attempts++;if(answer===previous){score++;el('message').textContent='정답! 잘하고 있어요.';next();}else{el('message').textContent='다시 한 번! 단어를 확인해 주세요.';el('answer').select();}el('score').textContent=score;el('accuracy').textContent=Math.round(score/attempts*100)+'%';});
+</script>
+</html>
